@@ -25,4 +25,14 @@ class Product extends Model
     {
         return $this->hasMany(Order::class); // Berarti Product memiliki banyak Order
     }
+
+    protected static function booted()
+{
+    static::saving(function ($product) {
+        $product->service_fee = 
+            $product->design_service + 
+            $product->packaging_service + 
+            $product->production_service;
+    });
+}
 }

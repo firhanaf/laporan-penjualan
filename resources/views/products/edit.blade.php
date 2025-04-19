@@ -15,7 +15,7 @@
     <input type="text" class="form-control" name="type" value="{{ old('type', $product->type) }}">
     <br>
 
-    @foreach (['print', 'production', 'packaging', 'design_service', 'packaging_service', 'production_service'] as $field)
+    @foreach (['print_fee', 'production_fee/additional', 'packaging_fee', 'design_service', 'packaging_service', 'production_service'] as $field)
       <label>{{ ucwords(str_replace('_', ' ', $field)) }}</label>
       <input type="number" step="0.01" class="form-control" name="{{ $field }}" value="{{ old($field, $product->$field) }}">
       <br>
