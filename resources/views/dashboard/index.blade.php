@@ -1,103 +1,143 @@
 @extends('layouts.global')
 
-@section('title', 'Dashboard')
-@section('pageTitle', 'Dashboard')
+@section('title') Dashboard @endsection
+@section('pageTitle') Dashboard Overview @endsection
 
 @section('content')
 <div class="container-fluid">
-    <div class="row mb-4">
+    <div class="row g-3 mb-4">
         <div class="col-md-4">
-            <div class="bg-light p-3 rounded shadow-sm">
-                <h6>Orders Today</h6>
-                <h3>{{ $ordersToday }}</h3>
+            <div class="card text-white bg-primary shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">Orders Today</h6>
+                    <h3>{{ $ordersToday }}</h3>
+                </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="bg-light p-3 rounded shadow-sm">
-                <h6>Orders This Week</h6>
-                <h3>{{ $ordersThisWeek }}</h3>
+            <div class="card text-white bg-success shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">Orders This Week</h6>
+                    <h3>{{ $ordersThisWeek }}</h3>
+                </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="bg-light p-3 rounded shadow-sm">
-                <h6>Orders This Month</h6>
-                <h3>{{ $ordersThisMonth }}</h3>
+            <div class="card text-white bg-info shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">Orders This Month</h6>
+                    <h3>{{ $ordersThisMonth }}</h3>
+                </div>
             </div>
         </div>
     </div>
 
-    {{-- Profit Section --}}
-    <div class="bg-white p-4 rounded shadow-sm">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">Profit ({{ $start->format('d M') }} - {{ $end->format('d M Y') }})</h5>
-            <form method="GET" action="{{ route('dashboard') }}" class="form-inline">
-                <input type="date" name="week" value="{{ $filterDate }}" class="form-control mr-2">
-                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-            </form>
+    {{-- Filter minggu --}}
+    <form method="GET" class="mb-3">
+    <div class="row g-2">
+        <div class="col-md-4">
+            <input type="date" name="week" class="form-control" value="{{ request('week') }}">
         </div>
-        <table class="table table-bordered">
-            <thead class="thead-light">
-                <tr>
-                    <th>Date</th>
-                    <th>Total Profit</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($profits as $profit)
+        <div class="col-md-2">
+            <button class="btn btn-primary">Filter</button> {{-- ubah di sini --}}
+        </div>
+    </div>
+</form>
+
+    {{-- Tabel Profit Mingguan --}}
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-black">
+            Profit per Day ({{ $start->format('d M') }} - {{ $end->format('d M Y') }})
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered mb-0">
+                <thead class="table-light">
                     <tr>
-                        <td>{{ \Carbon\Carbon::parse($profit->date)->format('D, d M Y') }}</td>
-                        <td>Rp {{ number_format($profit->total_profit, 2) }}</td>
+                        <th>Date</th>
+                        <th>Total Profit</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="2" class="text-center">No data found for this week.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-            <tfoot>
-                <tr style="background-color: #f8f9fa;">
-                    <th style="font-size: 1.1rem;">Total Weekly Profit</th>
-                    <th style="font-size: 1.2rem; font-weight: bold; color: #28a745;">
-                        Rp {{ number_format($totalWeeklyProfit, 2) }}
-                    </th>
-                </tr>
-            </tfoot>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse($profits as $profit)
+                        <tr>
+                            <td>{{ \Carbon\Carbon::parse($profit->date)->format('d-m-Y') }}</td>
+                            <td>Rp{{ number_format($profit->total_profit, 2) }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="2" class="text-center text-muted">No data available</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <strong>Total Weekly Profit:</strong> Rp{{ number_format($totalWeeklyProfit, 2) }}
+        </div>
     </div>
 
-    {{-- Service Fee Section --}}
-    <div class="bg-white p-4 rounded shadow-sm mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">Service Fee ({{ $start->format('d M') }} - {{ $end->format('d M Y') }})</h5>
+    {{-- Tabel Total Price Mingguan --}}
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-black">
+            Total Price per Day ({{ $start->format('d M') }} - {{ $end->format('d M Y') }})
         </div>
-        <table class="table table-bordered">
-            <thead class="thead-light">
-                <tr>
-                    <th>Date</th>
-                    <th>Total Service Fee</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($serviceFees as $fee)
+        <div class="card-body p-0">
+            <table class="table table-bordered mb-0">
+                <thead class="table-light">
                     <tr>
-                        <td>{{ \Carbon\Carbon::parse($fee->date)->format('D, d M Y') }}</td>
-                        <td>Rp {{ number_format($fee->total_service_fee, 2) }}</td>
+                        <th>Date</th>
+                        <th>Total Price</th>
                     </tr>
-                @empty
+                </thead>
+                <tbody>
+                    @forelse($totalPrices as $price)
+                        <tr>
+                            <td>{{ \Carbon\Carbon::parse($price->date)->format('d-m-Y') }}</td>
+                            <td>Rp{{ number_format($price->total_price, 2) }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="2" class="text-center text-muted">No data available</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <strong>Total Weekly Price:</strong> Rp{{ number_format($totalWeeklyPrice, 2) }}
+        </div>
+    </div>
+
+    {{-- Tabel Service Fee --}}
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-black">
+            Service Fee per Day ({{ $start->format('d M') }} - {{ $end->format('d M Y') }})
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered mb-0">
+                <thead class="table-light">
                     <tr>
-                        <td colspan="2" class="text-center">No data found for this week.</td>
+                        <th>Date</th>
+                        <th>Total Service Fee</th>
                     </tr>
-                @endforelse
-            </tbody>
-            <tfoot>
-                <tr style="background-color: #f8f9fa;">
-                    <th style="font-size: 1.1rem;">Total Weekly Service Fee</th>
-                    <th style="font-size: 1.2rem; font-weight: bold; color: #007bff;">
-                        Rp {{ number_format($totalWeeklyServiceFee, 2) }}
-                    </th>
-                </tr>
-            </tfoot>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse($serviceFees as $fee)
+                        <tr>
+                            <td>{{ \Carbon\Carbon::parse($fee->date)->format('d-m-Y') }}</td>
+                            <td>Rp{{ number_format($fee->total_service_fee, 2) }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="2" class="text-center text-muted">No data available</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <strong>Total Weekly Service Fee:</strong> Rp{{ number_format($totalWeeklyServiceFee, 2) }}
+        </div>
     </div>
 </div>
 @endsection

@@ -58,6 +58,18 @@ class DashboardController extends Controller
     // Total profit mingguan (hasil dari list di tabel)
     $totalWeeklyProfit = $profits->sum('total_profit');
 
+    $totalPrices = Order::select(
+        DB::raw("DATE(created_at) as date"),
+        DB::raw("SUM(total_price) as total_price")
+    )
+    ->whereBetween('created_at', [$start, $end])
+    ->groupBy(DB::raw("DATE(created_at)"))
+    ->orderBy("date", "asc")
+    ->get();
+
+// Total harga mingguannya (akumulasi)
+$totalWeeklyPrice = $totalPrices->sum('total_price');
+
     $serviceFees = Order::join('products', 'orders.product_id', '=', 'products.id')
         ->select(
             DB::raw('DATE(orders.created_at) as date'),
@@ -80,7 +92,9 @@ class DashboardController extends Controller
         'totalWeeklyServiceFee',
         'filterDate',
         'start',
-        'end'
+        'end',
+        'totalPrices',
+'totalWeeklyPrice'
     ));
 }
 }

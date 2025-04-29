@@ -11,7 +11,7 @@ class OrderController extends Controller
     public function index()
     {
         // Ambil semua order dengan relasi ke produk
-        $orders = Order::with('product')->orderBy('id', 'asc')->get();
+        $orders = Order::with('product')->orderBy('id', 'asc')->paginate(10);
         return view('orders.index', compact('orders'));
     }
 
